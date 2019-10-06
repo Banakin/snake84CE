@@ -1,0 +1,17 @@
+; Zilog eZ80 ANSI C Compiler Release 3.4
+; -optsize -noreduceopt -nomodsect -peephole -globalopt
+; -localcse -const=ROM 
+	FILE	"SRC\GFX\ALL_GFX.C"
+	.assume ADL=1
+	SEGMENT DATA
+_all_gfx_pal:
+	DW	0
+	DW	774
+	DW	61536
+	XDEF _all_gfx_pal
+;    1	// convpng v7.3
+;    2	#include <stdint.h>
+;    3	#include "all_gfx.h"
+;    4	
+;    5	uint16_t all_gfx_pal[3] = {
+	END
