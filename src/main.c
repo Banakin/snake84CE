@@ -94,6 +94,7 @@ void homeScreen() {
             // Acknowledge the reload
             timer_IntAcknowledge = TIMER1_RELOADED;
         }
+
         // Update kb_Data
         kb_Scan();
 
@@ -118,23 +119,57 @@ void homeScreen() {
 }
 
 void startGame() {
-    const char *startedGame = "GAME GOES HERE LOL";
+    // Variables
+    bool key, prevkey;
+    const char *pausedMessage = "Paused";
+    bool isPaused = false;
 
     // Clear screen (Set it to black)
+    gfx_SetColor(0);
     gfx_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT);
 
-    // Printing "GAME GOES HERE LOL"
-    gfx_SetTextScale(2, 2); // Text size
-    gfx_SetTextFGColor(255); // Text color
-    gfx_PrintStringXY(startedGame, (LCD_WIDTH - gfx_GetStringWidth(startedGame))/2, LCD_HEIGHT/2); // Print text
+    // Snake movment timer variables
+    timer_Control = TIMER1_DISABLE; // Disable the timer so it doesn't run when we don't want it to be running
+    timer_1_ReloadValue = timer_1_Counter = QUARTER_SECOND; // By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time
+    timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN; // Enable the timer, set it to the 32768 kHz clock, enable an interrupt once it reaches 0, and make it count down
 
     // Loop until Clear is pressed
     do {
+        // Snake movment timer
+        if (timer_IntStatus & TIMER1_RELOADED) {
+            gfx_SetColor(6);
+            gfx_FillRectangle(80, 80, 10, 10);
+            // Acknowledge the reload
+            timer_IntAcknowledge = TIMER1_RELOADED;
+        }
+
         // Update kb_Data
         kb_Scan();
 
-        if (kb_Data[6] == kb_Enter){
-            // pauseGame();
+        if (kb_Data[6] == kb_Enter && !prevkey){
+            if (isPaused == false){
+                // Disable the timer
+                timer_Control = TIMER1_DISABLE;
+                // Set the game to paused
+                isPaused = true;
+                // Clear the screen
+                gfx_SetColor(0);
+                gfx_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT);
+                // Set show paused screen
+                // Printing "GAME GOES HERE LOL"
+                gfx_SetTextScale(2, 2); // Text size
+                gfx_SetTextFGColor(255); // Text color
+                gfx_PrintStringXY(pausedMessage, (LCD_WIDTH - gfx_GetStringWidth(pausedMessage))/2, LCD_HEIGHT/2); // Print text
+            } else if (isPaused == true){
+                // Clear the screen
+                gfx_SetColor(0);
+                gfx_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT);
+                // Re-enable timer
+                timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN;
+                // Set the game to paused
+                isPaused = false;
+            }
+            prevkey = key;
         }
 
         if (kb_Data[6] == kb_Clear){

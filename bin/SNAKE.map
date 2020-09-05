@@ -2,20 +2,20 @@ Segment  Base   Top    High   Length
 -------- ------ ------ ------ -------
 icon     D1A882 D1A882             0h
 launcher D1A882 D1A8DA            58h
-libs     D1A8DA D1A92F            55h
-startup  D1A92F D1A96E            3Fh
-cleanup  D1A96E D1A982            14h
-exit     D1A982 D1A988             6h
-code     D1A988 D1AF73           5EBh
-data     D1AF73 D1AFAC            39h
-strsect  D1AFAC D1AFE8            3Ch
-text     D1AFE8 D1AFE8             0h
+libs     D1A8DA D1A933            59h
+startup  D1A933 D1A972            3Fh
+cleanup  D1A972 D1A986            14h
+exit     D1A986 D1A98C             6h
+code     D1A98C D1B076           6EAh
+data     D1B076 D1B0AF            39h
+strsect  D1B0AF D1B0DF            30h
+text     D1B0DF D1B0DF             0h
 bss      D031F6 D031FC D13FD6      6h
 header   D1A87F D1A882             3h
 
 Label                          Value
 ----------------------------   ------
-__OS                         = D1A988
+__OS                         = D1A98C
 _boot_GetBootMajorVer        = 000080
 _boot_GetHardwareVer         = 000084
 _boot_GetBootMinorVer        = 00008C
@@ -138,42 +138,43 @@ _asm_DisableAPD              = 021134
 _asm_EnableAPD               = 021138
 _asm_DrawStatusBar           = 021A3C
 _asm_ArcChk                  = 022040
-_os_DisableHomeTextBuffer    = D1A992
-_os_EnableHomeTextBuffer     = D1A9A4
-_zx7_Decompress              = D1A9B6
+_os_DisableHomeTextBuffer    = D1A996
+_os_EnableHomeTextBuffer     = D1A9A8
+_zx7_Decompress              = D1A9BA
 __scmpzero                   = 000204
-__frameset                   = D1AA22
+__frameset                   = D1AA26
 __ishru_b                    = 000184
 __ishru_b                    = 000188
-__s_sbrk                     = D1AA30
+__s_sbrk                     = D1AA34
 __icmpzero                   = 000138
-_malloc                      = D1AA81
+_malloc                      = D1AA85
 __alloc_base                 = D031F6
-_free                        = D1AB29
+_free                        = D1AB2D
 __findlibload                = D1A882
-__ccleanup                   = D1A96E
+__ccleanup                   = D1A972
 _errno                       = D008DC
 _init                        = D1A882
-_exit                        = D1A984
-__exit                       = D1A95D
-__exitsp                     = D1A95D
-__errsp                      = D1A95D
-_all_gfx_pal                 = D1AF98
-_snake_compressed            = D1AF9E
-_startGame                   = D1AEF0
-_homeScreen                  = D1AC2C
-_main                        = D1AC27
+_exit                        = D1A988
+__exit                       = D1A961
+__exitsp                     = D1A961
+__errsp                      = D1A961
+_all_gfx_pal                 = D1B09B
+_snake_compressed            = D1B0A1
+_startGame                   = D1AEF4
+_homeScreen                  = D1AC30
+_main                        = D1AC2B
 _gfx_Begin                   = D1A8ED
 _gfx_End                     = D1A8F1
-_gfx_SetPalette              = D1A8F5
-_gfx_FillScreen              = D1A8F9
-_gfx_PrintStringXY           = D1A8FD
-_gfx_SetTextBGColor          = D1A901
-_gfx_SetTextFGColor          = D1A905
-_gfx_SetTextTransparentColor = D1A909
-_gfx_GetStringWidth          = D1A90D
-_gfx_FillRectangle           = D1A911
-_gfx_AllocSprite             = D1A915
-_gfx_ScaledSprite_NoClip     = D1A919
-_gfx_SetTextScale            = D1A91D
-_kb_Scan                     = D1A92B
+_gfx_SetColor                = D1A8F5
+_gfx_SetPalette              = D1A8F9
+_gfx_FillScreen              = D1A8FD
+_gfx_PrintStringXY           = D1A901
+_gfx_SetTextBGColor          = D1A905
+_gfx_SetTextFGColor          = D1A909
+_gfx_SetTextTransparentColor = D1A90D
+_gfx_GetStringWidth          = D1A911
+_gfx_FillRectangle           = D1A915
+_gfx_AllocSprite             = D1A919
+_gfx_ScaledSprite_NoClip     = D1A91D
+_gfx_SetTextScale            = D1A921
+_kb_Scan                     = D1A92F
