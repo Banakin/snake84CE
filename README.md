@@ -3,6 +3,9 @@ A port of the classic game Snake made for the Ti 84-Plus CE.
 
 ---
 
+## Dependencies
+Please install the CLib library in order to run the game. YOu may do so [here](https://tiny.cc/clibs).
+
 ### The game requires the libraries from CE-Programming
 Github of the toolchain: [github.com/CE-Programming/toolchain](https://github.com/CE-Programming/toolchain)
 
