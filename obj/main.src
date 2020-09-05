@@ -276,8 +276,8 @@ _homeScreen:
 	LD	(HL),0
 	INC	HL
 	LD	(HL),0
-;   77	    timer_1_ReloadValue = timer_1_Counter = ONE_SECOND; // By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time
-	LD	BC,32768
+;   77	    timer_1_ReloadValue = timer_1_Counter = HALF_SECOND; // By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time
+	LD	BC,16384
 	LD	(15859712),BC
 	XOR	A,A
 	LD	(15859715),A

@@ -74,7 +74,7 @@ void homeScreen() {
 
     // Blinking text timer variables
     timer_Control = TIMER1_DISABLE; // Disable the timer so it doesn't run when we don't want it to be running
-    timer_1_ReloadValue = timer_1_Counter = ONE_SECOND; // By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time
+    timer_1_ReloadValue = timer_1_Counter = HALF_SECOND; // By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time
     timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN; // Enable the timer, set it to the 32768 kHz clock, enable an interrupt once it reaches 0, and make it count down
     
     // Loop until Clear is pressed
