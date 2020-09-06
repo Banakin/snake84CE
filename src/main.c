@@ -19,13 +19,17 @@
 #define HALF_SECOND       32768/2 // Half a second on the timer
 #define QUARTER_SECOND    32768/4 // A quarter second on the timer
 
+
+// Function declarations
+void homeScreen();
+void startGame();
+
 void main(void) {
     homeScreen(); // Load the home screen
 }
 
 void homeScreen() {
     // Variables
-    kb_key_t key;
     gfx_sprite_t *snake;
 
     unsigned seconds = 0;
@@ -120,7 +124,6 @@ void homeScreen() {
 
 void startGame() {
     // Variables
-    bool key, prevkey;
     const char *pausedMessage = "Paused";
     bool isPaused = false;
 
@@ -146,7 +149,7 @@ void startGame() {
         // Update kb_Data
         kb_Scan();
 
-        if (kb_Data[6] == kb_Enter && !prevkey){
+        if (kb_Data[6] == kb_Enter){
             if (isPaused == false){
                 // Disable the timer
                 timer_Control = TIMER1_DISABLE;
@@ -169,7 +172,6 @@ void startGame() {
                 // Set the game to paused
                 isPaused = false;
             }
-            prevkey = key;
         }
 
         if (kb_Data[6] == kb_Clear){
