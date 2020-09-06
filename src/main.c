@@ -14,7 +14,12 @@
 // Include the snake logos
 #include "gfx/all_gfx.h"
 
-#define TRANSPARENT_COLOR 10 // Some random transparent color
+#define TRANSPARENT_COLOR 10  // Some random transparent color
+#define WHITE_COLOR       255 // White
+#define BLACK_COLOR       0   // Black
+#define GREEN_COLOR       6   // Green
+#define RED_COLOR         224 // Red
+
 #define ONE_SECOND        32768/1 // One second on the timer
 #define HALF_SECOND       32768/2 // Half a second on the timer
 #define QUARTER_SECOND    32768/4 // A quarter second on the timer
@@ -54,7 +59,7 @@ void homeScreen() {
     gfx_SetPalette(all_gfx_pal, sizeof_all_gfx_pal, 0);
 
     // Fill the screen black
-    gfx_FillScreen(gfx_black);
+    gfx_FillScreen(BLACK_COLOR);
 
     // Set text BG and Transparent Color (Allows for white text)
     gfx_SetTextBGColor(TRANSPARENT_COLOR); // Set Text BG
@@ -68,12 +73,12 @@ void homeScreen() {
 
     // Printing "[enter] Start game"
     gfx_SetTextScale(2, 2); // Text size
-    gfx_SetTextFGColor(255); // Text color
+    gfx_SetTextFGColor(WHITE_COLOR); // Text color
     gfx_PrintStringXY(startText, (LCD_WIDTH - gfx_GetStringWidth(startText))/2, LCD_HEIGHT/2); // Print text
 
     // Printing "Made by Banakin"
     gfx_SetTextScale(1, 1); // Text size
-    gfx_SetTextFGColor(255); // Text color
+    gfx_SetTextFGColor(WHITE_COLOR); // Text color
     gfx_PrintStringXY(madeBy, (LCD_WIDTH - gfx_GetStringWidth(madeBy))/2, LCD_HEIGHT - 18); // Print text
 
     // Blinking text timer variables
@@ -88,7 +93,7 @@ void homeScreen() {
             if (startGameBlink == false) {
                 // Print a string
                 gfx_SetTextScale(2, 2); // Text size
-                gfx_SetTextFGColor(255); // Text color
+                gfx_SetTextFGColor(WHITE_COLOR); // Text color
                 gfx_PrintStringXY(startText, (LCD_WIDTH - gfx_GetStringWidth(startText))/2, LCD_HEIGHT/2); // Print text
                 startGameBlink = true;
             } else {
@@ -130,7 +135,7 @@ void startGame() {
     isPaused = true;
 
     // Clear screen (Set it to black)
-    gfx_FillScreen(gfx_black);
+    gfx_FillScreen(BLACK_COLOR);
 
     // Snake movement timer variables
     timer_Control = TIMER1_DISABLE; // Disable the timer so it doesn't run when we don't want it to be running
@@ -141,7 +146,7 @@ void startGame() {
     do {
         // Snake movement timer
         if (timer_IntStatus & TIMER1_RELOADED) {
-            gfx_SetColor(6);
+            gfx_SetColor(GREEN_COLOR);
             gfx_FillRectangle(80, 80, 10, 10);
             // Acknowledge the reload
             timer_IntAcknowledge = TIMER1_RELOADED;
@@ -157,16 +162,14 @@ void startGame() {
                 // Set the game to paused
                 isPaused = true;
                 // Clear the screen
-                gfx_SetColor(0);
-                gfx_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT);
+                gfx_FillScreen(BLACK_COLOR);
                 // Set show paused screen
                 gfx_SetTextScale(2, 2); // Text size
-                gfx_SetTextFGColor(255); // Text color
+                gfx_SetTextFGColor(WHITE_COLOR); // Text color
                 gfx_PrintStringXY(pausedMessage, (LCD_WIDTH - gfx_GetStringWidth(pausedMessage))/2, LCD_HEIGHT/2); // Print text
             } else {
                 // Clear the screen
-                gfx_SetColor(0);
-                gfx_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT);
+                gfx_FillScreen(BLACK_COLOR);
                 // Re-enable timer
                 timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN;
                 // Set the game to paused
