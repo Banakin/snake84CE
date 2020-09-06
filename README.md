@@ -11,3 +11,5 @@ Latest release: [github.com/CE-Programming/toolchain/releases/latest](https://gi
 
 ### To build the program follow the instructions from the repo above
 The command to build the program is `make`
+
+If I finish this game I will put the compiled versions in [releases](https://github.com/Banakin/snake84CE/releases).
