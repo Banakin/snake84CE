@@ -125,11 +125,12 @@ void homeScreen() {
 void startGame() {
     // Variables
     const char *pausedMessage = "Paused";
-    bool isPaused = false;
+    bool enterPrevkey, isPaused;
+    enterPrevkey = false;
+    isPaused = true;
 
     // Clear screen (Set it to black)
-    gfx_SetColor(0);
-    gfx_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    gfx_FillScreen(gfx_black);
 
     // Snake movement timer variables
     timer_Control = TIMER1_DISABLE; // Disable the timer so it doesn't run when we don't want it to be running
@@ -149,8 +150,8 @@ void startGame() {
         // Update kb_Data
         kb_Scan();
 
-        if (kb_Data[6] == kb_Enter){
-            if (isPaused == false){
+        if (kb_Data[6] == kb_Enter && !enterPrevkey){
+            if (!isPaused){
                 // Disable the timer
                 timer_Control = TIMER1_DISABLE;
                 // Set the game to paused
@@ -159,11 +160,10 @@ void startGame() {
                 gfx_SetColor(0);
                 gfx_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT);
                 // Set show paused screen
-                // Printing "GAME GOES HERE LOL"
                 gfx_SetTextScale(2, 2); // Text size
                 gfx_SetTextFGColor(255); // Text color
                 gfx_PrintStringXY(pausedMessage, (LCD_WIDTH - gfx_GetStringWidth(pausedMessage))/2, LCD_HEIGHT/2); // Print text
-            } else if (isPaused == true){
+            } else {
                 // Clear the screen
                 gfx_SetColor(0);
                 gfx_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -173,6 +173,7 @@ void startGame() {
                 isPaused = false;
             }
         }
+        enterPrevkey = kb_Data[6] == kb_Enter;
 
         if (kb_Data[6] == kb_Clear){
             // Close the graphics
