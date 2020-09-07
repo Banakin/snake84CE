@@ -14,18 +14,21 @@
 // Include the snake logos
 #include "gfx/all_gfx.h"
 
-#define TRANSPARENT_COLOR 10  // Some random transparent color
-#define WHITE_COLOR       255 // White
-#define BLACK_COLOR       0   // Black
-#define GREEN_COLOR       6   // Green
-#define RED_COLOR         224 // Red
+#define TRANSPARENT_COLOR   10  // Some random transparent color
+#define WHITE_COLOR         255 // White
+#define BLACK_COLOR         0   // Black
+#define GREEN_COLOR         6   // Green
+#define RED_COLOR           224 // Red
 
-#define TOP_SAFESPACE     20
-#define TOTAL_CORDS       (LCD_WIDTH/10)*(LCD_HEIGHT-TOP_SAFESPACE/10) // Total possible coordinates (used for setting arrays)
+#define SQUARE_SIZE         10
+#define TOP_SAFESPACE       2*SQUARE_SIZE
+#define WIDTH_TOTAL_CORDS   ((LCD_WIDTH/SQUARE_SIZE)-1)
+#define HEIGHT_TOTAL_CORDS  (((LCD_HEIGHT/SQUARE_SIZE)-1)-(TOP_SAFESPACE/SQUARE_SIZE))
+#define TOTAL_CORDS         ((WIDTH_TOTAL_CORDS)*(HEIGHT_TOTAL_CORDS)) // Total possible coordinates (used for setting arrays)
 
-#define ONE_SECOND        32768/1 // One second on the timer
-#define HALF_SECOND       32768/2 // Half a second on the timer
-#define QUARTER_SECOND    32768/4 // A quarter second on the timer
+#define ONE_SECOND          32768/1 // One second on the timer
+#define HALF_SECOND         32768/2 // Half a second on the timer
+#define QUARTER_SECOND      32768/4 // A quarter second on the timer
 
 
 // Function declarations
@@ -165,18 +168,18 @@ void startGame() {
         if (timer_IntStatus & TIMER1_RELOADED) {
             // Set goal
             gfx_SetColor(RED_COLOR);
-            gfx_FillRectangle(goalCords[0], goalCords[1], 10, 10);
+            gfx_FillRectangle(goalCords[0], goalCords[1], SQUARE_SIZE, SQUARE_SIZE);
 
             // Clear tail
             gfx_SetColor(BLACK_COLOR);
-            gfx_FillRectangle(snakeCordsX[0], snakeCordsY[0], 10, 10);
+            gfx_FillRectangle(snakeCordsX[0], snakeCordsY[0], SQUARE_SIZE, SQUARE_SIZE);
 
             // Check head boundaries
             if (
-                ((snakeCordsX[snakeLength-1]+10) >= LCD_WIDTH)     ||  // Right out of bounds (Cords cannot be bigger)
-                ((snakeCordsY[snakeLength-1]+10) >= LCD_HEIGHT)    ||  // Bottom out of bounds (Cords cannot be bigger)
-                ((snakeCordsX[snakeLength-1]-10) < 0)              ||  // Left out of bounds (Cords can be equal to)
-                ((snakeCordsY[snakeLength-1]-10) < TOP_SAFESPACE)      // Top out of bounds (Cords can be equal to)
+                ((snakeCordsX[snakeLength-1]+SQUARE_SIZE) >= LCD_WIDTH)     ||  // Right out of bounds (Cords cannot be bigger)
+                ((snakeCordsY[snakeLength-1]+SQUARE_SIZE) >= LCD_HEIGHT)    ||  // Bottom out of bounds (Cords cannot be bigger)
+                ((snakeCordsX[snakeLength-1]-SQUARE_SIZE) < 0)              ||  // Left out of bounds (Cords can be equal to)
+                ((snakeCordsY[snakeLength-1]-SQUARE_SIZE) < TOP_SAFESPACE)      // Top out of bounds (Cords can be equal to)
             ){
                 // Disable timer
                 timer_Control = TIMER1_DISABLE;
@@ -192,25 +195,25 @@ void startGame() {
                 gameScore = gameScore + 1;
 
                 // Get new location
-                goalCords[0] = (rand() % ((LCD_WIDTH/10)-1))*10; // Random number in safe space that is multiple of 10
-                goalCords[1] = (rand() % (((LCD_HEIGHT/10)-1)-(TOP_SAFESPACE/10)))*10+TOP_SAFESPACE; // Random number in safe space that is multiple of 10
+                goalCords[0] = (rand() % WIDTH_TOTAL_CORDS)*SQUARE_SIZE; // Random number in safe space that is multiple of square size
+                goalCords[1] = (rand() % HEIGHT_TOTAL_CORDS)*SQUARE_SIZE+TOP_SAFESPACE; // Random number in safe space that is multiple of square size
             }
 
             // Move right
-            snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]+10;
+            snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]+SQUARE_SIZE;
 
             // Move left
-            // snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]-10;
+            // snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]-SQUARE_SIZE;
             
             // Move down
-            // snakeCordsY[snakeLength-1] = snakeCordsY[snakeLength-1]+10;
+            // snakeCordsY[snakeLength-1] = snakeCordsY[snakeLength-1]+SQUARE_SIZE;
 
             // Move up
-            // snakeCordsY[snakeLength-1] = snakeCordsY[snakeLength-1]-10;
+            // snakeCordsY[snakeLength-1] = snakeCordsY[snakeLength-1]-SQUARE_SIZE;
 
             // Set head
             gfx_SetColor(GREEN_COLOR);
-            gfx_FillRectangle(snakeCordsX[snakeLength-1], snakeCordsY[snakeLength-1], 10, 10);
+            gfx_FillRectangle(snakeCordsX[snakeLength-1], snakeCordsY[snakeLength-1], SQUARE_SIZE, SQUARE_SIZE);
 
             // Acknowledge the reload
             timer_IntAcknowledge = TIMER1_RELOADED;
