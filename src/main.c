@@ -139,16 +139,17 @@ void homeScreen() {
 
 void startGame() {
     // Variables
+    kb_key_t arrowKeys;
     const char *pausedMessage = "Paused";
     bool enterPrevkey, isPaused;
-    int snakeCordsX[TOTAL_CORDS], snakeCordsY[TOTAL_CORDS]; // TAKES UP WAY TOO MUCH MEMORY
+    int snakeCords[TOTAL_CORDS];
     int snakeLength = 1;
     int goalCords[2] = {100, 80}; // Starting goal
     int gameScore = 0;
+    int snakeDirection = 0; // 0 = right, 1 = left, 2 = up, 3 = down
 
     // Set start cords
-    snakeCordsX[0] = 80;
-    snakeCordsY[0] = 80;
+    snakeCords[0] = 808;
 
     // Set pause bools
     enterPrevkey = false;
@@ -166,20 +167,34 @@ void startGame() {
     while (true) {
         // Snake movement timer
         if (timer_IntStatus & TIMER1_RELOADED) {
+            int headCordsX = (int)(snakeCords[snakeLength-1] / 100)*SQUARE_SIZE;
+            int headCordsY = (int)(snakeCords[snakeLength-1] % 100)*SQUARE_SIZE;
+            int tailCordsX = (int)(snakeCords[0] / 100)*SQUARE_SIZE;
+            int tailCordsY = (int)(snakeCords[0] % 100)*SQUARE_SIZE;
+            char scoreCounter[15];
+            sprintf(scoreCounter, "Score: %i", gameScore);
+
+            // Show variables
+            gfx_SetColor(BLACK_COLOR);
+            gfx_FillRectangle(0, 0, LCD_WIDTH, TOP_SAFESPACE-1);
+            gfx_SetTextScale(1, 1); // Text size
+            gfx_SetTextFGColor(WHITE_COLOR); // Text color
+            gfx_PrintStringXY(scoreCounter, 0, 0); // Print text
+
             // Set goal
             gfx_SetColor(RED_COLOR);
             gfx_FillRectangle(goalCords[0], goalCords[1], SQUARE_SIZE, SQUARE_SIZE);
 
             // Clear tail
             gfx_SetColor(BLACK_COLOR);
-            gfx_FillRectangle(snakeCordsX[0], snakeCordsY[0], SQUARE_SIZE, SQUARE_SIZE);
-
+            gfx_FillRectangle(tailCordsX, tailCordsY, SQUARE_SIZE, SQUARE_SIZE);
+            
             // Check head boundaries
             if (
-                ((snakeCordsX[snakeLength-1]+SQUARE_SIZE) >= LCD_WIDTH)     ||  // Right out of bounds (Cords cannot be bigger)
-                ((snakeCordsY[snakeLength-1]+SQUARE_SIZE) >= LCD_HEIGHT)    ||  // Bottom out of bounds (Cords cannot be bigger)
-                ((snakeCordsX[snakeLength-1]-SQUARE_SIZE) < 0)              ||  // Left out of bounds (Cords can be equal to)
-                ((snakeCordsY[snakeLength-1]-SQUARE_SIZE) < TOP_SAFESPACE)      // Top out of bounds (Cords can be equal to)
+                ((headCordsX+SQUARE_SIZE) >= LCD_WIDTH)     ||  // Right out of bounds (Cords cannot be bigger)
+                ((headCordsY+SQUARE_SIZE) >= LCD_HEIGHT)    ||  // Bottom out of bounds (Cords cannot be bigger)
+                ((headCordsX-SQUARE_SIZE) < 0)              ||  // Left out of bounds (Cords can be equal to)
+                ((headCordsY-SQUARE_SIZE) < TOP_SAFESPACE)      // Top out of bounds (Cords can be equal to)
             ){
                 // Disable timer
                 timer_Control = TIMER1_DISABLE;
@@ -190,7 +205,7 @@ void startGame() {
             }
             
             // If the head touches the goal
-            if ((goalCords[0] == snakeCordsX[snakeLength-1]) && (snakeCordsY[snakeLength-1] == goalCords[1])) {
+            if ((goalCords[0] == headCordsX) && (headCordsY == goalCords[1])) {
                 // Incrament game score
                 gameScore = gameScore + 1;
 
@@ -199,21 +214,28 @@ void startGame() {
                 goalCords[1] = (rand() % HEIGHT_TOTAL_CORDS)*SQUARE_SIZE+TOP_SAFESPACE; // Random number in safe space that is multiple of square size
             }
 
-            // Move right
-            snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]+SQUARE_SIZE;
 
-            // Move left
-            // snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]-SQUARE_SIZE;
-            
-            // Move down
-            // snakeCordsY[snakeLength-1] = snakeCordsY[snakeLength-1]+SQUARE_SIZE;
-
-            // Move up
-            // snakeCordsY[snakeLength-1] = snakeCordsY[snakeLength-1]-SQUARE_SIZE;
+            if (snakeDirection == 0) {
+                // Move right
+                snakeCords[snakeLength-1] = ((headCordsX/SQUARE_SIZE)+1)*100+((headCordsY/SQUARE_SIZE));
+            } else if (snakeDirection == 1) {
+                // Move left
+                snakeCords[snakeLength-1] = ((headCordsX/SQUARE_SIZE)-1)*100+((headCordsY/SQUARE_SIZE));
+            } else if (snakeDirection == 2) {
+                // Move up
+                snakeCords[snakeLength-1] = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)-1);
+            } else if (snakeDirection == 3) {
+                // Move down
+                snakeCords[snakeLength-1] = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)+1);
+            }
 
             // Set head
             gfx_SetColor(GREEN_COLOR);
-            gfx_FillRectangle(snakeCordsX[snakeLength-1], snakeCordsY[snakeLength-1], SQUARE_SIZE, SQUARE_SIZE);
+            gfx_FillRectangle(headCordsX, headCordsY, SQUARE_SIZE, SQUARE_SIZE);
+
+            // Set top border
+            gfx_SetColor(WHITE_COLOR);
+            gfx_FillRectangle(0, TOP_SAFESPACE, LCD_WIDTH, 1);
 
             // Acknowledge the reload
             timer_IntAcknowledge = TIMER1_RELOADED;
@@ -222,6 +244,44 @@ void startGame() {
         // Update kb_Data
         kb_Scan();
 
+        // Arrow keys
+        arrowKeys = kb_Data[7];
+        if (!isPaused){
+            switch (arrowKeys) {
+                case kb_Right:
+                    // If not coming from left, set to right
+                    if (snakeDirection != 1) {
+                        snakeDirection = 0;
+                    }
+                    break;
+
+                case kb_Left:
+                    // If not coming from right, set to left
+                    if (snakeDirection != 0) {
+                        snakeDirection = 1;
+                    }
+                    break;
+
+                case kb_Up:
+                    // If not coming from down, set to up
+                    if (snakeDirection != 3) {
+                        snakeDirection = 2;
+                    }
+                    break;
+
+                case kb_Down:
+                    // If not coming from down, set to up
+                    if (snakeDirection != 2) {
+                        snakeDirection = 3;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        // Check for enter key
         if (kb_Data[6] == kb_Enter && !enterPrevkey){
             if (!isPaused){
                 // Disable the timer
@@ -245,6 +305,7 @@ void startGame() {
         }
         enterPrevkey = kb_Data[6] == kb_Enter;
 
+        // Check for clear
         if (kb_Data[6] == kb_Clear){
             // Close the graphics
             gfx_End();
@@ -253,23 +314,24 @@ void startGame() {
     }
 }
 
-void dieScreen(int score) {
+void dieScreen(int gameScore) {
+    #define DEATH_MESSAGE "You Died"
+
     // Variables
-    const char *deathMessage = "You Died";
-    char *scoreMSG;
-    sprintf(scoreMSG, "Finial Score: %i", score);
+    char scoreMSG[18];
+    sprintf(scoreMSG, "Finial Score: %i", gameScore);
+    
+    // Set text color and size
+    gfx_SetTextScale(2, 2); // Text size
+    gfx_SetTextFGColor(WHITE_COLOR); // Text color
 
     // Clear the screen
     gfx_FillScreen(BLACK_COLOR);
 
     // Set show death message
-    gfx_SetTextScale(2, 2); // Text size
-    gfx_SetTextFGColor(WHITE_COLOR); // Text color
-    gfx_PrintStringXY(deathMessage, (LCD_WIDTH - gfx_GetStringWidth(deathMessage))/2, LCD_HEIGHT/3); // Print text
+    gfx_PrintStringXY(DEATH_MESSAGE, (LCD_WIDTH - gfx_GetStringWidth(DEATH_MESSAGE))/2, LCD_HEIGHT/3); // Print text
     
     // Show score
-    gfx_SetTextScale(2, 2); // Text size
-    gfx_SetTextFGColor(WHITE_COLOR); // Text color
     gfx_PrintStringXY(scoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT/3)*2); // Print text
 
     while (true) {
