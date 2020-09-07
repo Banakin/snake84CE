@@ -34,6 +34,7 @@ void startGame();
 void dieScreen(int score);
 
 void main(void) {
+    srand(rtc_Time()); // Seed random number generator with time
     homeScreen(); // Load the home screen
 }
 
@@ -139,7 +140,8 @@ void startGame() {
     bool enterPrevkey, isPaused;
     int snakeCordsX[TOTAL_CORDS], snakeCordsY[TOTAL_CORDS];
     int snakeLength = 1;
-    int goalCords[2] = {100, 120}; // Starting goal
+    int goalCords[2] = {100, 80}; // Starting goal
+    int gameScore = 0;
 
     // Set start cords
     snakeCordsX[0] = 80;
@@ -175,10 +177,23 @@ void startGame() {
                 ((snakeCordsY[snakeLength-1]+10) >= LCD_HEIGHT)    ||  // Bottom out of bounds (Cords cannot be bigger)
                 ((snakeCordsX[snakeLength-1]-10) < 0)              ||  // Left out of bounds (Cords can be equal to)
                 ((snakeCordsY[snakeLength-1]-10) < TOP_SAFESPACE)      // Top out of bounds (Cords can be equal to)
-            ) {
+            ){
+                // Disable timer
                 timer_Control = TIMER1_DISABLE;
-                dieScreen(0);
+                // Kill the player
+                dieScreen(gameScore);
+                // Break loop
                 break;
+            }
+            
+            // If the head touches the goal
+            if ((goalCords[0] == snakeCordsX[snakeLength-1]) && (snakeCordsY[snakeLength-1] == goalCords[1])) {
+                // Incrament game score
+                gameScore = gameScore + 1;
+                
+                // Get new location
+                goalCords[0] = (rand() % (LCD_WIDTH-10));
+                goalCords[1] = (rand() % ((LCD_HEIGHT-10)-TOP_SAFESPACE))+TOP_SAFESPACE;
             }
 
             // Move right
