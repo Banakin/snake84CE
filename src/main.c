@@ -174,11 +174,11 @@ void startGame() {
         // Snake movement timer
         if (timer_IntStatus & TIMER1_RELOADED) {
             int i;
+            int newHead;
             int headCordsX = (int)(snakeCords[0] / 100)*SQUARE_SIZE;
             int headCordsY = (int)(snakeCords[0] % 100)*SQUARE_SIZE;
             int tailCordsX = (int)(snakeCords[snakeLength-1] / 100)*SQUARE_SIZE;
             int tailCordsY = (int)(snakeCords[snakeLength-1] % 100)*SQUARE_SIZE;
-            int newHead;
             char scoreCounter[15];
             sprintf(scoreCounter, "Score: %i", gameScore);
             
