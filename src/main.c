@@ -190,10 +190,10 @@ void startGame() {
             if ((goalCords[0] == snakeCordsX[snakeLength-1]) && (snakeCordsY[snakeLength-1] == goalCords[1])) {
                 // Incrament game score
                 gameScore = gameScore + 1;
-                
+
                 // Get new location
-                goalCords[0] = (rand() % (LCD_WIDTH-10));
-                goalCords[1] = (rand() % ((LCD_HEIGHT-10)-TOP_SAFESPACE))+TOP_SAFESPACE;
+                goalCords[0] = (rand() % ((LCD_WIDTH/10)-1))*10; // Random number in safe space that is multiple of 10
+                goalCords[1] = (rand() % (((LCD_HEIGHT/10)-1)-(TOP_SAFESPACE/10)))*10+TOP_SAFESPACE; // Random number in safe space that is multiple of 10
             }
 
             // Move right
