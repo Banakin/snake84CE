@@ -90,7 +90,7 @@ void homeScreen() {
     timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN; // Enable the timer, set it to the 32768 kHz clock, enable an interrupt once it reaches 0, and make it count down
     
     // Loop until Clear is pressed
-    do {
+    while(true) {
         // Blinking text timer
         if (timer_IntStatus & TIMER1_RELOADED) {
             if (startGameBlink == false) {
@@ -117,6 +117,7 @@ void homeScreen() {
             free(snake);
             // Start the game
             startGame();
+            break;
         }
 
         if (kb_Data[6] == kb_Clear){
@@ -126,8 +127,9 @@ void homeScreen() {
             free(snake);
             // Close the graphics
             gfx_End();
+            break;
         }
-    } while (kb_Data[6] != kb_Clear && kb_Data[6] != kb_Enter);
+    }
 }
 
 void startGame() {
@@ -155,7 +157,7 @@ void startGame() {
     timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN; // Enable the timer, set it to the 32768 kHz clock, enable an interrupt once it reaches 0, and make it count down
 
     // Loop until Clear is pressed
-    do {
+    while (true) {
         // Snake movement timer
         if (timer_IntStatus & TIMER1_RELOADED) {
             // Set goal
@@ -212,8 +214,9 @@ void startGame() {
         if (kb_Data[6] == kb_Clear){
             // Close the graphics
             gfx_End();
+            break;
         }
-    } while (kb_Data[6] != kb_Clear /* && kb_Data[6] != kb_Enter */);
+    }
 }
 
 void dieScreen(int score) {
@@ -234,4 +237,16 @@ void dieScreen(int score) {
     gfx_SetTextScale(2, 2); // Text size
     gfx_SetTextFGColor(WHITE_COLOR); // Text color
     gfx_PrintStringXY(scoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT/3)*2); // Print text
+
+    while (true) {
+        // Update kb_Data
+        kb_Scan();
+
+        // Exit on clear or enter
+        if (kb_Data[6] == kb_Clear || kb_Data[6] == kb_Enter){
+            // Close the graphics
+            gfx_End();
+            break;
+        }
+    }
 }
