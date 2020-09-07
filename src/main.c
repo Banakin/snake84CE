@@ -29,6 +29,7 @@
 #define ONE_SECOND          32768/1 // One second on the timer
 #define HALF_SECOND         32768/2 // Half a second on the timer
 #define QUARTER_SECOND      32768/4 // A quarter second on the timer
+#define SIXTH_SECOND        32768/6 // A sixth of a second on the timer
 
 
 // Function declarations
@@ -143,13 +144,15 @@ void startGame() {
     const char *pausedMessage = "Paused";
     bool enterPrevkey, isPaused;
     int snakeCords[TOTAL_CORDS];
-    int snakeLength = 1;
-    int goalCords[2] = {100, 80}; // Starting goal
+    int snakeLength = 2;
+    int goalCords[2] = {120, 100}; // Starting goal
     int gameScore = 0;
-    int snakeDirection = 0; // 0 = right, 1 = left, 2 = up, 3 = down
+    int snakeDirectionTimer = 0; // 0 = right, 1 = left, 2 = up, 3 = down
+    int snakeDirectionLoop = 0; // 0 = right, 1 = left, 2 = up, 3 = down
 
     // Set start cords
-    snakeCords[0] = 808;
+    snakeCords[0] = 708;
+    snakeCords[1] = 808;
 
     // Set pause bools
     enterPrevkey = false;
@@ -160,41 +163,27 @@ void startGame() {
 
     // Snake movement timer variables
     timer_Control = TIMER1_DISABLE; // Disable the timer so it doesn't run when we don't want it to be running
-    timer_1_ReloadValue = timer_1_Counter = QUARTER_SECOND; // By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time
+    timer_1_ReloadValue = timer_1_Counter = SIXTH_SECOND; // By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time
     timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN; // Enable the timer, set it to the 32768 kHz clock, enable an interrupt once it reaches 0, and make it count down
 
     // Loop until Clear is pressed
     while (true) {
         // Snake movement timer
         if (timer_IntStatus & TIMER1_RELOADED) {
-            int headCordsX = (int)(snakeCords[snakeLength-1] / 100)*SQUARE_SIZE;
-            int headCordsY = (int)(snakeCords[snakeLength-1] % 100)*SQUARE_SIZE;
-            int tailCordsX = (int)(snakeCords[0] / 100)*SQUARE_SIZE;
-            int tailCordsY = (int)(snakeCords[0] % 100)*SQUARE_SIZE;
+            int i;
+            int headCordsX = (int)(snakeCords[0] / 100)*SQUARE_SIZE;
+            int headCordsY = (int)(snakeCords[0] % 100)*SQUARE_SIZE;
+            int tailCordsX = (int)(snakeCords[snakeLength-1] / 100)*SQUARE_SIZE;
+            int tailCordsY = (int)(snakeCords[snakeLength-1] % 100)*SQUARE_SIZE;
             char scoreCounter[15];
             sprintf(scoreCounter, "Score: %i", gameScore);
-
-            // Show variables
-            gfx_SetColor(BLACK_COLOR);
-            gfx_FillRectangle(0, 0, LCD_WIDTH, TOP_SAFESPACE-1);
-            gfx_SetTextScale(1, 1); // Text size
-            gfx_SetTextFGColor(WHITE_COLOR); // Text color
-            gfx_PrintStringXY(scoreCounter, 0, 0); // Print text
-
-            // Set goal
-            gfx_SetColor(RED_COLOR);
-            gfx_FillRectangle(goalCords[0], goalCords[1], SQUARE_SIZE, SQUARE_SIZE);
-
-            // Clear tail
-            gfx_SetColor(BLACK_COLOR);
-            gfx_FillRectangle(tailCordsX, tailCordsY, SQUARE_SIZE, SQUARE_SIZE);
             
             // Check head boundaries
             if (
-                ((headCordsX+SQUARE_SIZE) >= LCD_WIDTH)     ||  // Right out of bounds (Cords cannot be bigger)
-                ((headCordsY+SQUARE_SIZE) >= LCD_HEIGHT)    ||  // Bottom out of bounds (Cords cannot be bigger)
-                ((headCordsX-SQUARE_SIZE) < 0)              ||  // Left out of bounds (Cords can be equal to)
-                ((headCordsY-SQUARE_SIZE) < TOP_SAFESPACE)      // Top out of bounds (Cords can be equal to)
+                ((headCordsX) >= LCD_WIDTH)     ||  // Right out of bounds (Cords cannot be bigger)
+                ((headCordsY) >= LCD_HEIGHT)    ||  // Bottom out of bounds (Cords cannot be bigger)
+                ((headCordsX) < 0)              ||  // Left out of bounds (Cords can be equal to)
+                ((headCordsY) < TOP_SAFESPACE)      // Top out of bounds (Cords can be equal to)
             ){
                 // Disable timer
                 timer_Control = TIMER1_DISABLE;
@@ -203,35 +192,63 @@ void startGame() {
                 // Break loop
                 break;
             }
-            
+
             // If the head touches the goal
             if ((goalCords[0] == headCordsX) && (headCordsY == goalCords[1])) {
                 // Incrament game score
                 gameScore = gameScore + 1;
+
+                // Incrament snake length
+                snakeLength = snakeLength + 1;
 
                 // Get new location
                 goalCords[0] = (rand() % WIDTH_TOTAL_CORDS)*SQUARE_SIZE; // Random number in safe space that is multiple of square size
                 goalCords[1] = (rand() % HEIGHT_TOTAL_CORDS)*SQUARE_SIZE+TOP_SAFESPACE; // Random number in safe space that is multiple of square size
             }
 
+            // Set goal
+            gfx_SetColor(RED_COLOR);
+            gfx_FillRectangle(goalCords[0], goalCords[1], SQUARE_SIZE, SQUARE_SIZE);
 
-            if (snakeDirection == 0) {
-                // Move right
-                snakeCords[snakeLength-1] = ((headCordsX/SQUARE_SIZE)+1)*100+((headCordsY/SQUARE_SIZE));
-            } else if (snakeDirection == 1) {
-                // Move left
-                snakeCords[snakeLength-1] = ((headCordsX/SQUARE_SIZE)-1)*100+((headCordsY/SQUARE_SIZE));
-            } else if (snakeDirection == 2) {
-                // Move up
-                snakeCords[snakeLength-1] = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)-1);
-            } else if (snakeDirection == 3) {
-                // Move down
-                snakeCords[snakeLength-1] = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)+1);
+            // Clear tail
+            gfx_SetColor(BLACK_COLOR);
+            gfx_FillRectangle(tailCordsX, tailCordsY, SQUARE_SIZE, SQUARE_SIZE);
+
+            // Shift snake down array
+            for (i = snakeLength-1; i > 0; i--) {
+                snakeCords[i] = snakeCords[i-1];
             }
+            
+            // Move the snake
+            snakeDirectionTimer = snakeDirectionLoop;
+            if (snakeDirectionTimer == 0) {
+                // Move right
+                snakeCords[0] = ((headCordsX/SQUARE_SIZE)+1)*100+((headCordsY/SQUARE_SIZE));
+            } else if (snakeDirectionTimer == 1) {
+                // Move left
+                snakeCords[0] = ((headCordsX/SQUARE_SIZE)-1)*100+((headCordsY/SQUARE_SIZE));
+            } else if (snakeDirectionTimer == 2) {
+                // Move up
+                snakeCords[0] = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)-1);
+            } else if (snakeDirectionTimer == 3) {
+                // Move down
+                snakeCords[0] = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)+1);
+            }
+
+            // Update headCords variables
+            headCordsX = (int)(snakeCords[0] / 100)*SQUARE_SIZE;
+            headCordsY = (int)(snakeCords[0] % 100)*SQUARE_SIZE;
 
             // Set head
             gfx_SetColor(GREEN_COLOR);
             gfx_FillRectangle(headCordsX, headCordsY, SQUARE_SIZE, SQUARE_SIZE);
+
+            // Show score
+            gfx_SetColor(BLACK_COLOR);
+            gfx_FillRectangle(0, 0, LCD_WIDTH, TOP_SAFESPACE-1);
+            gfx_SetTextScale(1, 1); // Text size
+            gfx_SetTextFGColor(WHITE_COLOR); // Text color
+            gfx_PrintStringXY(scoreCounter, 0, 0); // Print text
 
             // Set top border
             gfx_SetColor(WHITE_COLOR);
@@ -250,29 +267,29 @@ void startGame() {
             switch (arrowKeys) {
                 case kb_Right:
                     // If not coming from left, set to right
-                    if (snakeDirection != 1) {
-                        snakeDirection = 0;
+                    if (snakeDirectionTimer != 1) {
+                        snakeDirectionLoop = 0;
                     }
                     break;
 
                 case kb_Left:
                     // If not coming from right, set to left
-                    if (snakeDirection != 0) {
-                        snakeDirection = 1;
+                    if (snakeDirectionTimer != 0) {
+                        snakeDirectionLoop = 1;
                     }
                     break;
 
                 case kb_Up:
                     // If not coming from down, set to up
-                    if (snakeDirection != 3) {
-                        snakeDirection = 2;
+                    if (snakeDirectionTimer != 3) {
+                        snakeDirectionLoop = 2;
                     }
                     break;
 
                 case kb_Down:
                     // If not coming from down, set to up
-                    if (snakeDirection != 2) {
-                        snakeDirection = 3;
+                    if (snakeDirectionTimer != 2) {
+                        snakeDirectionLoop = 3;
                     }
                     break;
 
@@ -295,8 +312,17 @@ void startGame() {
                 gfx_SetTextFGColor(WHITE_COLOR); // Text color
                 gfx_PrintStringXY(pausedMessage, (LCD_WIDTH - gfx_GetStringWidth(pausedMessage))/2, LCD_HEIGHT/2); // Print text
             } else {
+                int i;
+
                 // Clear the screen
                 gfx_FillScreen(BLACK_COLOR);
+
+                // Redraw body
+                gfx_SetColor(GREEN_COLOR);
+                for (i = 0; i < snakeLength; i++) {
+                    gfx_FillRectangle((int)(snakeCords[i] / 100)*SQUARE_SIZE, (int)(snakeCords[i] % 100)*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+                }
+                
                 // Re-enable timer
                 timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN;
                 // Set the game to paused
