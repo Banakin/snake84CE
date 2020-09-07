@@ -131,6 +131,8 @@ void homeScreen() {
             timer_Control = TIMER1_DISABLE;
             // Clear the sprite from memory
             free(snake);
+            // Close everything
+            ti_CloseAll();
             // Close the graphics
             gfx_End();
             break;
@@ -144,15 +146,16 @@ void startGame() {
     const char *pausedMessage = "Paused";
     bool enterPrevkey, isPaused;
     int snakeCords[TOTAL_CORDS];
-    int snakeLength = 2;
+    int snakeLength = 3;
     int goalCords[2] = {120, 100}; // Starting goal
     int gameScore = 0;
     int snakeDirectionTimer = 0; // 0 = right, 1 = left, 2 = up, 3 = down
     int snakeDirectionLoop = 0; // 0 = right, 1 = left, 2 = up, 3 = down
 
     // Set start cords
-    snakeCords[0] = 708;
-    snakeCords[1] = 808;
+    snakeCords[0] = 808;
+    snakeCords[1] = 708;
+    snakeCords[2] = 608;
 
     // Set pause bools
     enterPrevkey = false;
@@ -175,6 +178,7 @@ void startGame() {
             int headCordsY = (int)(snakeCords[0] % 100)*SQUARE_SIZE;
             int tailCordsX = (int)(snakeCords[snakeLength-1] / 100)*SQUARE_SIZE;
             int tailCordsY = (int)(snakeCords[snakeLength-1] % 100)*SQUARE_SIZE;
+            int newHead;
             char scoreCounter[15];
             sprintf(scoreCounter, "Score: %i", gameScore);
             
@@ -195,15 +199,31 @@ void startGame() {
 
             // If the head touches the goal
             if ((goalCords[0] == headCordsX) && (headCordsY == goalCords[1])) {
+                bool newCordAccepted = false;
+
                 // Incrament game score
                 gameScore = gameScore + 1;
 
                 // Incrament snake length
                 snakeLength = snakeLength + 1;
 
-                // Get new location
-                goalCords[0] = (rand() % WIDTH_TOTAL_CORDS)*SQUARE_SIZE; // Random number in safe space that is multiple of square size
-                goalCords[1] = (rand() % HEIGHT_TOTAL_CORDS)*SQUARE_SIZE+TOP_SAFESPACE; // Random number in safe space that is multiple of square size
+                // If the new cordinate is not accepted
+                while (!newCordAccepted) {
+                    // Get new location
+                    int newCordX = (rand() % WIDTH_TOTAL_CORDS)*SQUARE_SIZE; // Random number in safe space that is multiple of square size
+                    int newCordY = (rand() % HEIGHT_TOTAL_CORDS)*SQUARE_SIZE+TOP_SAFESPACE; // Random number in safe space that is multiple of square size
+
+                    // Loop through array
+                    for (i = 0; i < snakeLength; i++) {
+                        // If the new location is not in the array accept else continue looking
+                        if ((newCordX != (int)(snakeCords[i] / 100)*SQUARE_SIZE) && (newCordY != (int)(snakeCords[i] % 100)*SQUARE_SIZE)) {
+                            newCordAccepted = true;
+                            goalCords[0] = newCordX;
+                            goalCords[1] = newCordY;
+                        }
+                        break;
+                    }
+                }
             }
 
             // Set goal
@@ -214,26 +234,40 @@ void startGame() {
             gfx_SetColor(BLACK_COLOR);
             gfx_FillRectangle(tailCordsX, tailCordsY, SQUARE_SIZE, SQUARE_SIZE);
 
-            // Shift snake down array
-            for (i = snakeLength-1; i > 0; i--) {
-                snakeCords[i] = snakeCords[i-1];
-            }
-            
             // Move the snake
             snakeDirectionTimer = snakeDirectionLoop;
             if (snakeDirectionTimer == 0) {
                 // Move right
-                snakeCords[0] = ((headCordsX/SQUARE_SIZE)+1)*100+((headCordsY/SQUARE_SIZE));
+                newHead = ((headCordsX/SQUARE_SIZE)+1)*100+((headCordsY/SQUARE_SIZE));
             } else if (snakeDirectionTimer == 1) {
                 // Move left
-                snakeCords[0] = ((headCordsX/SQUARE_SIZE)-1)*100+((headCordsY/SQUARE_SIZE));
+                newHead = ((headCordsX/SQUARE_SIZE)-1)*100+((headCordsY/SQUARE_SIZE));
             } else if (snakeDirectionTimer == 2) {
                 // Move up
-                snakeCords[0] = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)-1);
+                newHead = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)-1);
             } else if (snakeDirectionTimer == 3) {
                 // Move down
-                snakeCords[0] = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)+1);
+                newHead = ((headCordsX/SQUARE_SIZE))*100+((headCordsY/SQUARE_SIZE)+1);
             }
+
+            // Loop through snake
+            for (i = snakeLength-1; i > 0; i--) {
+                // If new head exists in snake then kill player
+                if (snakeCords[i] == newHead) {
+                    // Disable timer
+                    timer_Control = TIMER1_DISABLE;
+                    // Kill the player
+                    dieScreen(gameScore);
+                    // Break loop
+                    break;
+                }
+
+                // Shift down the array
+                snakeCords[i] = snakeCords[i-1];
+            }
+            
+            // Add new head to array
+            snakeCords[0] = newHead;
 
             // Update headCords variables
             headCordsX = (int)(snakeCords[0] / 100)*SQUARE_SIZE;
@@ -246,7 +280,7 @@ void startGame() {
             // Show score
             gfx_SetColor(BLACK_COLOR);
             gfx_FillRectangle(0, 0, LCD_WIDTH, TOP_SAFESPACE-1);
-            gfx_SetTextScale(1, 1); // Text size
+            gfx_SetTextScale(2, 2); // Text size
             gfx_SetTextFGColor(WHITE_COLOR); // Text color
             gfx_PrintStringXY(scoreCounter, 0, 0); // Print text
 
@@ -333,6 +367,8 @@ void startGame() {
 
         // Check for clear
         if (kb_Data[6] == kb_Clear){
+            // Close everything
+            ti_CloseAll();
             // Close the graphics
             gfx_End();
             break;
@@ -366,6 +402,8 @@ void dieScreen(int gameScore) {
 
         // Exit on clear or enter
         if (kb_Data[6] == kb_Clear || kb_Data[6] == kb_Enter){
+            // Close everything
+            ti_CloseAll();
             // Close the graphics
             gfx_End();
             break;
