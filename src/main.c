@@ -20,6 +20,8 @@
 #define GREEN_COLOR       6   // Green
 #define RED_COLOR         224 // Red
 
+#define TOTAL_CORDS      (LCD_WIDTH/10)*(LCD_HEIGHT/10) // Total possible coordinates (used for setting arrays)
+
 #define ONE_SECOND        32768/1 // One second on the timer
 #define HALF_SECOND       32768/2 // Half a second on the timer
 #define QUARTER_SECOND    32768/4 // A quarter second on the timer
@@ -28,6 +30,7 @@
 // Function declarations
 void homeScreen();
 void startGame();
+void dieScreen(int score);
 
 void main(void) {
     homeScreen(); // Load the home screen
@@ -131,6 +134,15 @@ void startGame() {
     // Variables
     const char *pausedMessage = "Paused";
     bool enterPrevkey, isPaused;
+    int snakeCordsX[TOTAL_CORDS], snakeCordsY[TOTAL_CORDS];
+    int snakeLength = 1;
+    int goalCords[2] = {100, 120}; // Starting goal
+
+    // Set start cords
+    snakeCordsX[0] = 80;
+    snakeCordsY[0] = 80;
+
+    // Set pause bools
     enterPrevkey = false;
     isPaused = true;
 
@@ -146,8 +158,27 @@ void startGame() {
     do {
         // Snake movement timer
         if (timer_IntStatus & TIMER1_RELOADED) {
+            // Set goal
+            gfx_SetColor(RED_COLOR);
+            gfx_FillRectangle(goalCords[0], goalCords[1], 10, 10);
+
+            // Clear tail
+            gfx_SetColor(BLACK_COLOR);
+            gfx_FillRectangle(snakeCordsX[0], snakeCordsY[0], 10, 10);
+
+            // Move 10px right
+            if ((snakeCordsX[snakeLength-1]+10) >= LCD_WIDTH) {
+                timer_Control = TIMER1_DISABLE;
+                dieScreen(0);
+                break;
+            } else {
+                snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]+10;
+            }
+
+            // Set head
             gfx_SetColor(GREEN_COLOR);
-            gfx_FillRectangle(80, 80, 10, 10);
+            gfx_FillRectangle(snakeCordsX[snakeLength-1], snakeCordsY[snakeLength-1], 10, 10);
+
             // Acknowledge the reload
             timer_IntAcknowledge = TIMER1_RELOADED;
         }
@@ -183,4 +214,24 @@ void startGame() {
             gfx_End();
         }
     } while (kb_Data[6] != kb_Clear /* && kb_Data[6] != kb_Enter */);
+}
+
+void dieScreen(int score) {
+    // Variables
+    const char *deathMessage = "You Died";
+    char *scoreMSG;
+    sprintf(scoreMSG, "Finial Score: %i", score);
+
+    // Clear the screen
+    gfx_FillScreen(BLACK_COLOR);
+
+    // Set show death message
+    gfx_SetTextScale(2, 2); // Text size
+    gfx_SetTextFGColor(WHITE_COLOR); // Text color
+    gfx_PrintStringXY(deathMessage, (LCD_WIDTH - gfx_GetStringWidth(deathMessage))/2, LCD_HEIGHT/3); // Print text
+    
+    // Show score
+    gfx_SetTextScale(2, 2); // Text size
+    gfx_SetTextFGColor(WHITE_COLOR); // Text color
+    gfx_PrintStringXY(scoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT/3)*2); // Print text
 }
