@@ -3,7 +3,7 @@ A port of the classic game Snake made for the Ti 84-Plus CE.
 
 ![Home Screen](/screeenshots/screenshot1.png?raw=true)
 ![Game](/screeenshots/screenshot2.png?raw=true)
-<!-- ![Death Screen](/screeenshots/screenshot3.png?raw=true) -->
+![Death Screen](/screeenshots/screenshot3.png?raw=true)
 
 ## Controls
 ### Home Screen
