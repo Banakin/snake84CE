@@ -381,7 +381,7 @@ void dieScreen(int gameScore) {
 
     // Variables
     char scoreMSG[18];
-    sprintf(scoreMSG, "Finial Score: %i", gameScore);
+    sprintf(scoreMSG, "Final Score: %i", gameScore);
     
     // Set text color and size
     gfx_SetTextScale(2, 2); // Text size
