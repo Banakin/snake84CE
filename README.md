@@ -11,7 +11,7 @@ A port of the classic game Snake made for the Ti 84-Plus CE.
 - `[CLEAR]` Quits the game
 
 ### Game
-- `[LEFT]/[RIGHT]/[UP]/[DOWN]` Move Snake accordingly
+- `[LEFT]/[RIGHT]/[UP]/[DOWN]` Moves the Snake accordingly
 - `[ENTER]` Pauses the game
 - `[CLEAR]` Quits the game
 
