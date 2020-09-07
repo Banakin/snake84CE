@@ -20,7 +20,8 @@
 #define GREEN_COLOR       6   // Green
 #define RED_COLOR         224 // Red
 
-#define TOTAL_CORDS      (LCD_WIDTH/10)*(LCD_HEIGHT/10) // Total possible coordinates (used for setting arrays)
+#define TOP_SAFESPACE     20
+#define TOTAL_CORDS       (LCD_WIDTH/10)*(LCD_HEIGHT-TOP_SAFESPACE/10) // Total possible coordinates (used for setting arrays)
 
 #define ONE_SECOND        32768/1 // One second on the timer
 #define HALF_SECOND       32768/2 // Half a second on the timer
@@ -168,14 +169,29 @@ void startGame() {
             gfx_SetColor(BLACK_COLOR);
             gfx_FillRectangle(snakeCordsX[0], snakeCordsY[0], 10, 10);
 
-            // Move 10px right
-            if ((snakeCordsX[snakeLength-1]+10) >= LCD_WIDTH) {
+            // Check head boundaries
+            if (
+                ((snakeCordsX[snakeLength-1]+10) >= LCD_WIDTH)     ||  // Right out of bounds (Cords cannot be bigger)
+                ((snakeCordsY[snakeLength-1]+10) >= LCD_HEIGHT)    ||  // Bottom out of bounds (Cords cannot be bigger)
+                ((snakeCordsX[snakeLength-1]-10) < 0)              ||  // Left out of bounds (Cords can be equal to)
+                ((snakeCordsY[snakeLength-1]-10) < TOP_SAFESPACE)      // Top out of bounds (Cords can be equal to)
+            ) {
                 timer_Control = TIMER1_DISABLE;
                 dieScreen(0);
                 break;
-            } else {
-                snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]+10;
             }
+
+            // Move right
+            snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]+10;
+
+            // Move left
+            // snakeCordsX[snakeLength-1] = snakeCordsX[snakeLength-1]-10;
+            
+            // Move down
+            // snakeCordsY[snakeLength-1] = snakeCordsY[snakeLength-1]+10;
+
+            // Move up
+            // snakeCordsY[snakeLength-1] = snakeCordsY[snakeLength-1]-10;
 
             // Set head
             gfx_SetColor(GREEN_COLOR);
