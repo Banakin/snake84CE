@@ -24,7 +24,7 @@
 #define TOP_SAFESPACE       2*SQUARE_SIZE
 #define WIDTH_TOTAL_CORDS   ((LCD_WIDTH/SQUARE_SIZE)-1)
 #define HEIGHT_TOTAL_CORDS  (((LCD_HEIGHT/SQUARE_SIZE)-1)-(TOP_SAFESPACE/SQUARE_SIZE))
-#define TOTAL_CORDS         ((WIDTH_TOTAL_CORDS)*(HEIGHT_TOTAL_CORDS)) // Total possible coordinates (used for setting arrays)
+#define TOTAL_CORDS         (WIDTH_TOTAL_CORDS*HEIGHT_TOTAL_CORDS) // Total possible coordinates (used for setting arrays)
 
 #define ONE_SECOND          32768/1 // One second on the timer
 #define HALF_SECOND         32768/2 // Half a second on the timer
@@ -141,7 +141,7 @@ void startGame() {
     // Variables
     const char *pausedMessage = "Paused";
     bool enterPrevkey, isPaused;
-    int snakeCordsX[TOTAL_CORDS], snakeCordsY[TOTAL_CORDS];
+    int snakeCordsX[TOTAL_CORDS], snakeCordsY[TOTAL_CORDS]; // TAKES UP WAY TOO MUCH MEMORY
     int snakeLength = 1;
     int goalCords[2] = {100, 80}; // Starting goal
     int gameScore = 0;
