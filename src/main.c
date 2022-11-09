@@ -46,12 +46,13 @@
 // Function declarations
 void homeScreen();
 void startGame();
-void dieScreen(int score);
-int handleHighScore(int score);
+void dieScreen(uint16_t score);
+uint16_t handleHighScore(uint16_t score);
 
 int main(void) {
     srand(rtc_Time()); // Seed random number generator with time
     homeScreen(); // Load the home screen
+    return 0;
 }
 
 void homeScreen() {
@@ -154,12 +155,12 @@ void startGame() {
     kb_key_t arrowKeys;
     const char *pausedMessage = "Paused";
     bool enterPrevkey, isPaused;
-    int snakeCords[TOTAL_CORDS];
-    int snakeLength = 3;
-    int goalCords[2] = {120, 100}; // Starting goal
-    int gameScore = 0;
-    int snakeDirectionTimer = 0; // 0 = right, 1 = left, 2 = up, 3 = down
-    int snakeDirectionLoop = 0; // 0 = right, 1 = left, 2 = up, 3 = down
+    uint16_t snakeCords[TOTAL_CORDS];
+    uint16_t snakeLength = 3;
+    uint16_t goalCords[2] = {120, 100}; // Starting goal
+    uint16_t gameScore = 0;
+    uint8_t snakeDirectionTimer = 0; // 0 = right, 1 = left, 2 = up, 3 = down
+    uint8_t snakeDirectionLoop = 0; // 0 = right, 1 = left, 2 = up, 3 = down
 
     // Set start cords
     snakeCords[0] = 808;
@@ -183,12 +184,11 @@ void startGame() {
     while (true) {
         // Snake movement timer
         if (timer_IntStatus & TIMER1_RELOADED) {
-            int i;
-            int newHead;
-            int headCordsX = (int)(snakeCords[0] / 100)*SQUARE_SIZE;
-            int headCordsY = (int)(snakeCords[0] % 100)*SQUARE_SIZE;
-            int tailCordsX = (int)(snakeCords[snakeLength-1] / 100)*SQUARE_SIZE;
-            int tailCordsY = (int)(snakeCords[snakeLength-1] % 100)*SQUARE_SIZE;
+            uint16_t newHead;
+            uint16_t headCordsX = (uint16_t)(snakeCords[0] / 100)*SQUARE_SIZE;
+            uint16_t headCordsY = (uint16_t)(snakeCords[0] % 100)*SQUARE_SIZE;
+            uint16_t tailCordsX = (uint16_t)(snakeCords[snakeLength-1] / 100)*SQUARE_SIZE;
+            uint16_t tailCordsY = (uint16_t)(snakeCords[snakeLength-1] % 100)*SQUARE_SIZE;
             char scoreCounter[15];
             sprintf(scoreCounter, "Score: %i", gameScore);
             
@@ -219,15 +219,15 @@ void startGame() {
                 bool newCoordAccepted = false;
                 while (!newCoordAccepted) {
                     // Get new location
-                    int newCordX = (rand() % WIDTH_TOTAL_CORDS)*SQUARE_SIZE; // Random number in safe space that is multiple of square size
-                    int newCordY = (rand() % HEIGHT_TOTAL_CORDS)*SQUARE_SIZE+TOP_SAFESPACE; // Random number in safe space that is multiple of square size
+                    uint16_t newCordX = (rand() % WIDTH_TOTAL_CORDS)*SQUARE_SIZE; // Random number in safe space that is multiple of square size
+                    uint16_t newCordY = (rand() % HEIGHT_TOTAL_CORDS)*SQUARE_SIZE+TOP_SAFESPACE; // Random number in safe space that is multiple of square size
 
                     // Check if the new coord is on the snake
                     bool notInList = true;
-                    for (i = 0; (i < snakeLength) && notInList; i++) {
+                    for (uint16_t i = 0; (i < snakeLength) && notInList; i++) {
                         // If the new location is on the snake stop looking
-                        if ((newCordX == (int)(snakeCords[i] / 100)*SQUARE_SIZE) &&
-                            (newCordY == (int)(snakeCords[i] % 100)*SQUARE_SIZE)) {
+                        if ((newCordX == (uint16_t)(snakeCords[i] / 100)*SQUARE_SIZE) &&
+                            (newCordY == (uint16_t)(snakeCords[i] % 100)*SQUARE_SIZE)) {
                             notInList = false;
                         }
                     }
@@ -267,7 +267,7 @@ void startGame() {
             }
 
             // Loop through snake
-            for (i = snakeLength-1; i > 0; i--) {
+            for (uint16_t i = snakeLength-1; i > 0; i--) {
                 // If new head exists in snake then kill player
                 if (snakeCords[i] == newHead) {
                     // Disable timer
@@ -286,8 +286,8 @@ void startGame() {
             snakeCords[0] = newHead;
 
             // Update headCords variables
-            headCordsX = (int)(snakeCords[0] / 100)*SQUARE_SIZE;
-            headCordsY = (int)(snakeCords[0] % 100)*SQUARE_SIZE;
+            headCordsX = (uint16_t)(snakeCords[0] / 100)*SQUARE_SIZE;
+            headCordsY = (uint16_t)(snakeCords[0] % 100)*SQUARE_SIZE;
 
             // Set head
             gfx_SetColor(GREEN_COLOR);
@@ -390,7 +390,7 @@ void startGame() {
     }
 }
 
-void dieScreen(int gameScore) {
+void dieScreen(uint16_t gameScore) {
     // Variables
     char highScoreMSG[18];
     sprintf(highScoreMSG, "High Score: %i", handleHighScore(gameScore));
@@ -416,7 +416,6 @@ void dieScreen(int gameScore) {
     gfx_SetTextScale(2, 2);
     gfx_PrintStringXY(EXIT_MSG, (LCD_WIDTH - gfx_GetStringWidth(EXIT_MSG))/2, (LCD_HEIGHT*7)/16);
 
-    // TODO High Score
     // Show high score
     gfx_SetTextScale(2, 2);
     gfx_PrintStringXY(highScoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT*5)/8);
@@ -442,18 +441,36 @@ void dieScreen(int gameScore) {
     }
 }
 
-int handleHighScore(int score) {
-    return score;
-    // See if high score exists
-        // If it does not exist
-            // make a new one and set the current score as it
-            // Return current score
+// TODO High score handler, currently unreliable and can cause crashing
+uint16_t handleHighScore(uint16_t score) {
+    // High score
+    uint16_t highScore = 0;
 
-        // If it does exist
-            // Check if current score is bigger
-                // Set high score to current score
-                // Return current score
-            
-            // If the current score is not bigger
-                // Return the high score
+    // Get high score from file
+    ti_var_t HSFile;
+    HSFile = ti_Open("SnakeHS", "r+");
+    if(HSFile) {
+        ti_Read(&highScore, sizeof(uint8_t), sizeof(highScore)/sizeof(uint8_t), HSFile);
+        ti_Close(HSFile);
+    }
+
+
+    // Check if current score is bigger
+    if (score > highScore) {
+        highScore = score;
+    }
+
+    // Write highScore to file
+    HSFile = ti_Open("SnakeHS", "w");
+    if(HSFile) {
+        ti_Write(&highScore, sizeof(uint8_t), sizeof(highScore)/sizeof(uint8_t), HSFile);
+    }
+
+    // Close high score file
+    if (HSFile) {
+        // ti_SetArchiveStatus(true, HSFile);
+        ti_Close(HSFile);
+    }
+
+    return highScore;       
 }
