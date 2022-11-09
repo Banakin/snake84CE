@@ -1,15 +1,16 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <tice.h>
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <tice.h>
 #include <graphx.h>
 #include <keypadc.h>
+#include <compression.h>
 
 // Include the snake logos
 #include "gfx/all_gfx.h"
@@ -37,7 +38,7 @@ void homeScreen();
 void startGame();
 void dieScreen(int score);
 
-void main(void) {
+int main(void) {
     srand(rtc_Time()); // Seed random number generator with time
     homeScreen(); // Load the home screen
 }
@@ -46,8 +47,6 @@ void homeScreen() {
     // Variables
     gfx_sprite_t *snake;
 
-    unsigned seconds = 0;
-    char str[10];
     bool startGameBlink = false;
 
     const char *title = "Snake";
@@ -131,8 +130,6 @@ void homeScreen() {
             timer_Control = TIMER1_DISABLE;
             // Clear the sprite from memory
             free(snake);
-            // Close everything
-            ti_CloseAll();
             // Close the graphics
             gfx_End();
             break;
@@ -201,13 +198,14 @@ void startGame() {
             if ((goalCords[0] == headCordsX) && (headCordsY == goalCords[1])) {
                 bool newCordAccepted = false;
 
-                // Incrament game score
+                // Increment game score
                 gameScore = gameScore + 1;
 
-                // Incrament snake length
+                // Increment snake length
                 snakeLength = snakeLength + 1;
 
-                // If the new cordinate is not accepted
+                // TODO Fix coord search
+                // If the new coordinate is not accepted
                 while (!newCordAccepted) {
                     // Get new location
                     int newCordX = (rand() % WIDTH_TOTAL_CORDS)*SQUARE_SIZE; // Random number in safe space that is multiple of square size
@@ -367,8 +365,6 @@ void startGame() {
 
         // Check for clear
         if (kb_Data[6] == kb_Clear){
-            // Close everything
-            ti_CloseAll();
             // Close the graphics
             gfx_End();
             break;
@@ -402,8 +398,6 @@ void dieScreen(int gameScore) {
 
         // Exit on clear or enter
         if (kb_Data[6] == kb_Clear || kb_Data[6] == kb_Enter){
-            // Close everything
-            ti_CloseAll();
             // Close the graphics
             gfx_End();
             break;
