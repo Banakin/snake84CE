@@ -12,4 +12,5 @@ DESCRIPTION ?= "Snake for the TI-84 Plus CE"
 
 # ----------------------------
 
-include $(CEDEV)/include/.makefile
+# include $(CEDEV)/include/.makefile
+include $(shell cedev-config --makefile)
