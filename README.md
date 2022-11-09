@@ -16,7 +16,8 @@ A port of the classic game Snake made for the Ti 84-Plus CE.
 - `[CLEAR]` Quits the game
 
 ### Death Screen
-- `[ENTER]` and `[CLEAR]` Quit the game
+- `[ENTER]` Play again
+- `[CLEAR]` Quit the game
 
 ## Downloading
 You may download the compiled `.8xp` file from [releases](https://github.com/Banakin/snake84CE/releases).
