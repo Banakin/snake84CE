@@ -47,6 +47,7 @@
 void homeScreen();
 void startGame();
 void dieScreen(int score);
+int handleHighScore(int score);
 
 int main(void) {
     srand(rtc_Time()); // Seed random number generator with time
@@ -169,7 +170,8 @@ void startGame() {
     enterPrevkey = false;
     isPaused = true;
 
-    // Clear screen (Set it to black)
+    // Clear home screen again and make screen black
+    os_ClrHome();
     gfx_FillScreen(BLACK_COLOR);
 
     // Snake movement timer variables
@@ -390,8 +392,8 @@ void startGame() {
 
 void dieScreen(int gameScore) {
     // Variables
-    // char highScoreMSG[18];
-    // sprintf(highScoreMSG, "High Score: %i", handleHighScore(gameScore));
+    char highScoreMSG[18];
+    sprintf(highScoreMSG, "High Score: %i", handleHighScore(gameScore));
 
     char scoreMSG[18];
     sprintf(scoreMSG, "Final Score: %i", gameScore);
@@ -416,12 +418,12 @@ void dieScreen(int gameScore) {
 
     // TODO High Score
     // Show high score
-    // gfx_SetTextScale(1, 1);
-    // gfx_PrintStringXY(highScoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT/4)*3);
+    gfx_SetTextScale(2, 2);
+    gfx_PrintStringXY(highScoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT*5)/8);
 
     // Show score
     gfx_SetTextScale(2, 2);
-    gfx_PrintStringXY(scoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT/4)*3); // Print text
+    gfx_PrintStringXY(scoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT*3)/4); // Print text
 
     while (true) {
         // Update kb_Data
@@ -440,7 +442,8 @@ void dieScreen(int gameScore) {
     }
 }
 
-// int handleHighScore(int score) {
+int handleHighScore(int score) {
+    return score;
     // See if high score exists
         // If it does not exist
             // make a new one and set the current score as it
@@ -453,4 +456,4 @@ void dieScreen(int gameScore) {
             
             // If the current score is not bigger
                 // Return the high score
-// }
+}
