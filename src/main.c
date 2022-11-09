@@ -32,6 +32,15 @@
 #define QUARTER_SECOND      32768/4 // A quarter second on the timer
 #define SIXTH_SECOND        32768/6 // A sixth of a second on the timer
 
+#define TITLE "Snake"
+#define START_TEXT "[ENTER] Start game"
+#define VERSION_NUM "v1.1.0"
+#define MADE_BY "Made by Brendan"
+
+#define DEATH_MESSAGE "You Died"
+#define PLAY_AGAIN_MSG "[ENTER] Play again"
+#define EXIT_MSG "[CLEAR] Exit game"
+
 
 // Function declarations
 void homeScreen();
@@ -48,10 +57,6 @@ void homeScreen() {
     gfx_sprite_t *snake;
 
     bool startGameBlink = false;
-
-    const char *title = "Snake";
-    const char *startText = "[ENTER] Start game";
-    const char *madeBy = "Made by Brendan";
 
     // Allocate space for the decompressed sprite
     snake = gfx_MallocSprite(snake_width, snake_height); // Same as: gfx_AllocSprite(apple_width, apple_height, malloc)
@@ -76,18 +81,23 @@ void homeScreen() {
     // Printing title and icon
     gfx_SetTextScale(5, 5); // Text size
     gfx_SetTextFGColor(6); // Text color
-    gfx_PrintStringXY(title, (LCD_WIDTH - ((snake_width*13)+ 10 + gfx_GetStringWidth(title)))/2+((snake_width*13)+ 10), 10); // Print text
-    gfx_ScaledSprite_NoClip(snake, (LCD_WIDTH - ((snake_width*13)+ 10 + gfx_GetStringWidth(title)))/2, 10, 13, 13); // Print icon (Sprite)
+    gfx_PrintStringXY(TITLE, (LCD_WIDTH - ((snake_width*13)+ 10 + gfx_GetStringWidth(TITLE)))/2+((snake_width*13)+ 10), 10); // Print text
+    gfx_ScaledSprite_NoClip(snake, (LCD_WIDTH - ((snake_width*13)+ 10 + gfx_GetStringWidth(TITLE)))/2, 10, 13, 13); // Print icon (Sprite)
 
-    // Printing "[enter] Start game"
+    // Printing "[ENTER] Start game"
     gfx_SetTextScale(2, 2); // Text size
     gfx_SetTextFGColor(WHITE_COLOR); // Text color
-    gfx_PrintStringXY(startText, (LCD_WIDTH - gfx_GetStringWidth(startText))/2, LCD_HEIGHT/2); // Print text
+    gfx_PrintStringXY(START_TEXT, (LCD_WIDTH - gfx_GetStringWidth(START_TEXT))/2, LCD_HEIGHT/2); // Print text
+
+    // Printing version number
+    gfx_SetTextScale(1, 1); // Text size
+    gfx_SetTextFGColor(WHITE_COLOR); // Text color
+    gfx_PrintStringXY(VERSION_NUM, (LCD_WIDTH - gfx_GetStringWidth(VERSION_NUM))/2, LCD_HEIGHT - 18*2); // Print text
 
     // Printing "Made by Brendan"
     gfx_SetTextScale(1, 1); // Text size
     gfx_SetTextFGColor(WHITE_COLOR); // Text color
-    gfx_PrintStringXY(madeBy, (LCD_WIDTH - gfx_GetStringWidth(madeBy))/2, LCD_HEIGHT - 18); // Print text
+    gfx_PrintStringXY(MADE_BY, (LCD_WIDTH - gfx_GetStringWidth(MADE_BY))/2, LCD_HEIGHT - 18); // Print text
 
     // Blinking text timer variables
     timer_Control = TIMER1_DISABLE; // Disable the timer so it doesn't run when we don't want it to be running
@@ -102,10 +112,10 @@ void homeScreen() {
                 // Print a string
                 gfx_SetTextScale(2, 2); // Text size
                 gfx_SetTextFGColor(WHITE_COLOR); // Text color
-                gfx_PrintStringXY(startText, (LCD_WIDTH - gfx_GetStringWidth(startText))/2, LCD_HEIGHT/2); // Print text
+                gfx_PrintStringXY(START_TEXT, (LCD_WIDTH - gfx_GetStringWidth(START_TEXT))/2, LCD_HEIGHT/2); // Print text
                 startGameBlink = true;
             } else {
-                gfx_FillRectangle((LCD_WIDTH - gfx_GetStringWidth(startText))/2, LCD_HEIGHT/2, gfx_GetStringWidth(startText), 16);
+                gfx_FillRectangle((LCD_WIDTH - gfx_GetStringWidth(START_TEXT))/2, LCD_HEIGHT/2, gfx_GetStringWidth(START_TEXT), 16);
                 startGameBlink = false;
             }
             // Acknowledge the reload
@@ -378,34 +388,49 @@ void startGame() {
 }
 
 void dieScreen(int gameScore) {
-    #define DEATH_MESSAGE "You Died"
-
     // Variables
     char scoreMSG[18];
     sprintf(scoreMSG, "Final Score: %i", gameScore);
     
-    // Set text color and size
-    gfx_SetTextScale(2, 2); // Text size
+    // Set text color
     gfx_SetTextFGColor(WHITE_COLOR); // Text color
 
     // Clear the screen
     gfx_FillScreen(BLACK_COLOR);
 
-    // Set show death message
-    gfx_PrintStringXY(DEATH_MESSAGE, (LCD_WIDTH - gfx_GetStringWidth(DEATH_MESSAGE))/2, LCD_HEIGHT/3); // Print text
+    // Show death message
+    gfx_SetTextScale(3, 3);
+    gfx_PrintStringXY(DEATH_MESSAGE, (LCD_WIDTH - gfx_GetStringWidth(DEATH_MESSAGE))/2, LCD_HEIGHT/8); // Print text
     
+    // Show play again
+    gfx_SetTextScale(2, 2);
+    gfx_PrintStringXY(PLAY_AGAIN_MSG, (LCD_WIDTH - gfx_GetStringWidth(PLAY_AGAIN_MSG))/2, (LCD_HEIGHT*5)/16);
+    
+    // Show exit game
+    gfx_SetTextScale(2, 2);
+    gfx_PrintStringXY(EXIT_MSG, (LCD_WIDTH - gfx_GetStringWidth(EXIT_MSG))/2, (LCD_HEIGHT*7)/16);
+
+    // TODO High Score
+    // Show high score
+    gfx_SetTextScale(1, 1);
+
     // Show score
-    gfx_PrintStringXY(scoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT/3)*2); // Print text
+    gfx_SetTextScale(2, 2);
+    gfx_PrintStringXY(scoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT/4)*3); // Print text
 
     while (true) {
         // Update kb_Data
         kb_Scan();
 
         // Exit on clear or enter
-        if (kb_Data[6] == kb_Clear || kb_Data[6] == kb_Enter){
+        if (kb_Data[6] == kb_Clear){
             // Close the graphics
             gfx_End();
             break;
+        } else if (kb_Data[6] == kb_Enter) {
+            startGame();
+            break;
         }
+        
     }
 }
