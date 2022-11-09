@@ -10,6 +10,7 @@
 #include <tice.h>
 #include <graphx.h>
 #include <keypadc.h>
+#include <fileioc.h>
 #include <compression.h>
 
 // Include the snake logos
@@ -389,6 +390,9 @@ void startGame() {
 
 void dieScreen(int gameScore) {
     // Variables
+    // char highScoreMSG[18];
+    // sprintf(highScoreMSG, "High Score: %i", handleHighScore(gameScore));
+
     char scoreMSG[18];
     sprintf(scoreMSG, "Final Score: %i", gameScore);
     
@@ -412,7 +416,8 @@ void dieScreen(int gameScore) {
 
     // TODO High Score
     // Show high score
-    gfx_SetTextScale(1, 1);
+    // gfx_SetTextScale(1, 1);
+    // gfx_PrintStringXY(highScoreMSG, (LCD_WIDTH - gfx_GetStringWidth(scoreMSG))/2, (LCD_HEIGHT/4)*3);
 
     // Show score
     gfx_SetTextScale(2, 2);
@@ -434,3 +439,18 @@ void dieScreen(int gameScore) {
         
     }
 }
+
+// int handleHighScore(int score) {
+    // See if high score exists
+        // If it does not exist
+            // make a new one and set the current score as it
+            // Return current score
+
+        // If it does exist
+            // Check if current score is bigger
+                // Set high score to current score
+                // Return current score
+            
+            // If the current score is not bigger
+                // Return the high score
+// }
