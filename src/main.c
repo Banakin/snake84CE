@@ -196,30 +196,35 @@ void startGame() {
 
             // If the head touches the goal
             if ((goalCords[0] == headCordsX) && (headCordsY == goalCords[1])) {
-                bool newCordAccepted = false;
-
                 // Increment game score
                 gameScore = gameScore + 1;
 
                 // Increment snake length
                 snakeLength = snakeLength + 1;
 
-                // TODO Fix coord search
-                // If the new coordinate is not accepted
-                while (!newCordAccepted) {
+                // Look for a new goal thats not on the snake
+                bool newCoordAccepted = false;
+                while (!newCoordAccepted) {
                     // Get new location
                     int newCordX = (rand() % WIDTH_TOTAL_CORDS)*SQUARE_SIZE; // Random number in safe space that is multiple of square size
                     int newCordY = (rand() % HEIGHT_TOTAL_CORDS)*SQUARE_SIZE+TOP_SAFESPACE; // Random number in safe space that is multiple of square size
 
-                    // Loop through array
-                    for (i = 0; i < snakeLength; i++) {
-                        // If the new location is not in the array accept else continue looking
-                        if ((newCordX != (int)(snakeCords[i] / 100)*SQUARE_SIZE) && (newCordY != (int)(snakeCords[i] % 100)*SQUARE_SIZE)) {
-                            newCordAccepted = true;
-                            goalCords[0] = newCordX;
-                            goalCords[1] = newCordY;
+                    // Check if the new coord is on the snake
+                    bool notInList = true;
+                    for (i = 0; (i < snakeLength) && notInList; i++) {
+                        // If the new location is on the snake stop looking
+                        if ((newCordX == (int)(snakeCords[i] / 100)*SQUARE_SIZE) &&
+                            (newCordY == (int)(snakeCords[i] % 100)*SQUARE_SIZE)) {
+                            notInList = false;
                         }
-                        break;
+                    }
+
+                    // If the new coord is not in the list
+                    // Set as new goal and stop the while loop
+                    if (notInList) {
+                        goalCords[0] = newCordX;
+                        goalCords[1] = newCordY;
+                        newCoordAccepted = true;
                     }
                 }
             }
