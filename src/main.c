@@ -52,7 +52,7 @@ void homeScreen() {
 
     const char *title = "Snake";
     const char *startText = "[ENTER] Start game";
-    const char *madeBy = "Made by Banakin";
+    const char *madeBy = "Made by Brendan";
 
     // Allocate space for the decompressed sprite
     snake = gfx_MallocSprite(snake_width, snake_height); // Same as: gfx_AllocSprite(apple_width, apple_height, malloc)
@@ -85,7 +85,7 @@ void homeScreen() {
     gfx_SetTextFGColor(WHITE_COLOR); // Text color
     gfx_PrintStringXY(startText, (LCD_WIDTH - gfx_GetStringWidth(startText))/2, LCD_HEIGHT/2); // Print text
 
-    // Printing "Made by Banakin"
+    // Printing "Made by Brendan"
     gfx_SetTextScale(1, 1); // Text size
     gfx_SetTextFGColor(WHITE_COLOR); // Text color
     gfx_PrintStringXY(madeBy, (LCD_WIDTH - gfx_GetStringWidth(madeBy))/2, LCD_HEIGHT - 18); // Print text
